@@ -22,7 +22,7 @@ NC='\033[0m'
 FW_BOLD=$(tput bold)
 FW_NORMAL=$(tput sgr0)
 
-if [[ -n $1 || $1 != "--only-link" ]]
+if [[ -z $1 || ( -n $1 && $1 != "--only-link" ) ]]
 then
     echo "\n${YELLOW}${FW_BOLD}|> Checking Homebrew installation${NC}${FW_NORMAL}"
     which -s brew
@@ -95,24 +95,24 @@ then
     else
         echo "${GREEN}|> All packages installed successfully${NC}"
     fi
+fi
 
-    BASE_DIR=""
-    if [[ -f "./packages.list" ]]
+BASE_DIR=""
+if [[ -f "./packages.list" ]]
+then
+    BASE_DIR=$(pwd)
+else
+    url=$(dirname $0)
+    if [[ -f "${url}/packages.list" ]]
     then
-        BASE_DIR=$(pwd)
-    else
-        url=$(dirname $0)
-        if [[ -f "${url}/packages.list" ]]
-        then
-            BASE_DIR="$url"
-        fi
+        BASE_DIR="$url"
     fi
+fi
 
-    if [[ -z "${BASE_DIR}" ]]
-    then
-        echo "${RED}|> Couldn't find setup folder, quitting${NC}"
-        exit 3
-    fi
+if [[ -z "${BASE_DIR}" ]]
+then
+    echo "${RED}|> Couldn't find setup folder, quitting${NC}"
+    exit 3
 fi
 
 
