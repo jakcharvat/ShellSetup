@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 
 BLACK='\033[0;30m'
@@ -30,6 +30,15 @@ then
     # Install brew
     echo "${BLUE}|-->${NC} ${FW_BOLD}Homebrew${FW_NORMAL} not installed, installing it now"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    if [[ $(uname -s) == "Linux" ]]
+    then
+        test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+        test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+        test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+        echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+    fi
+
     which -s brew
     if [[ $? != 0 ]]
     then
