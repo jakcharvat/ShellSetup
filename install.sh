@@ -22,95 +22,97 @@ NC='\033[0m'
 FW_BOLD=$(tput bold)
 FW_NORMAL=$(tput sgr0)
 
-
-echo "\n${YELLOW}${FW_BOLD}|> Checking Homebrew installation${NC}${FW_NORMAL}"
-which -s brew
-if [[ $? != 0 ]]
+if [[ -n $1 && $1 != "--only-link" ]]
 then
-    # Install brew
-    echo "${BLUE}|-->${NC} ${FW_BOLD}Homebrew${FW_NORMAL} not installed, installing it now"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    if [[ $(uname -s) == "Linux" ]]
-    then
-        test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-        test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-        test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-        echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-    fi
-
+    echo "\n${YELLOW}${FW_BOLD}|> Checking Homebrew installation${NC}${FW_NORMAL}"
     which -s brew
     if [[ $? != 0 ]]
     then
-        # brew still not installed
-        echo "${RED}|--> Couldn't install ${FW_BOLD}Homebrew${FW_NORMAL}, exitting${NC}"
-        exit 1
+        # Install brew
+        echo "${BLUE}|-->${NC} ${FW_BOLD}Homebrew${FW_NORMAL} not installed, installing it now"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        if [[ $(uname -s) == "Linux" ]]
+        then
+            test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+            test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+            test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+            echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+        fi
+
+        which -s brew
+        if [[ $? != 0 ]]
+        then
+            # brew still not installed
+            echo "${RED}|--> Couldn't install ${FW_BOLD}Homebrew${FW_NORMAL}${RED}, exitting${NC}"
+            exit 1
+        else
+            echo "${GREEN}|--> ${FW_BOLD}Homebrew${FW_NORMAL}${GREEN} installed successfully${NC}"
+        fi
     else
-        echo "${GREEN}|--> ${FW_BOLD}Homebrew${FW_NORMAL} installed successfully${NC}"
+        echo "${BLUE}|-->${NC} ${FW_BOLD}Homebrew${FW_NORMAL} installed, updating it"
+        #brew update
     fi
-else
-    echo "${BLUE}|-->${NC} ${FW_BOLD}Homebrew${FW_NORMAL} installed, updating it"
-    #brew update
-fi
 
-echo "\n${YELLOW}${FW_BOLD}|> Installing Homebrew packages${NC}${FW_NORMAL}"
-failedPackages=""
-for package in $(cat $(dirname $0)/packages.list)
-do
-    #break
-    if [[ -z $package ]]; then continue; fi
-
-    if brew ls --versions "$package" > /dev/null
-    then
-        echo "${BLUE}|-->${NC} Package ${FW_BOLD}${package}${FW_NORMAL} is installed"
-    else
-        echo "${BLUE}|-->${NC} Package ${FW_BOLD}${package}${FW_NORMAL} is not installed"
-        echo "${BLUE}|-->${NC} Installing ${FW_BOLD}${package}${FW_NORMAL}"
-        brew install "$package"
+    echo "\n${YELLOW}${FW_BOLD}|> Installing Homebrew packages${NC}${FW_NORMAL}"
+    failedPackages=""
+    for package in $(cat $(dirname $0)/packages.list)
+    do
+        #break
+        if [[ -z $package ]]; then continue; fi
 
         if brew ls --versions "$package" > /dev/null
         then
-            echo "${GREEN}|--> Installed ${FW_BOLD}${package}${FW_NORMAL}${NC}"
+            echo "${BLUE}|-->${NC} Package ${FW_BOLD}${package}${FW_NORMAL} is installed"
         else
-            echo "${RED}|--> Failed to install ${FW_BOLD}${package}${FW_NORMAL}${NC}"
-            failedPackages+="${package}\n"
+            echo "${BLUE}|-->${NC} Package ${FW_BOLD}${package}${FW_NORMAL} is not installed"
+            echo "${BLUE}|-->${NC} Installing ${FW_BOLD}${package}${FW_NORMAL}"
+            brew install "$package"
+
+            if brew ls --versions "$package" > /dev/null
+            then
+                echo "${GREEN}|--> Installed ${FW_BOLD}${package}${FW_NORMAL}${NC}"
+            else
+                echo "${RED}|--> Failed to install ${FW_BOLD}${package}${FW_NORMAL}${NC}"
+                failedPackages+="${package}\n"
+            fi
         fi
-    fi
-done
-
-if [[ -n "$failedPackages" ]]
-then
-    echo "\n${RED}|> Failed to install packages"
-    echo "${RED}|> Try once more or install the packages manually and run the script again"
-    echo "${RED}${FW_BOLD}|> Failed packages are:${FW_NORMAL}${NC}"
-
-    for package in "$failedPackages"
-    do
-        echo "${BLUE}|-->${NC} ${FW_BOLD}${package}${FW_NORMAL}"
     done
 
-    echo "${RED}${FW_BOLD}Quitting${NC}${FW_NORMAL}"
-    exit 2
-else
-    echo "${GREEN}|> All packages installed successfully${NC}"
-fi
-
-BASE_DIR=""
-if [[ -f "./packages.list" ]]
-then
-    BASE_DIR=$(pwd)
-else
-    url=$(dirname $0)
-    if [[ -f "${url}/packages.list" ]]
+    if [[ -n "$failedPackages" ]]
     then
-        BASE_DIR="$url"
-    fi
-fi
+        echo "\n${RED}|> Failed to install packages"
+        echo "${RED}|> Try once more or install the packages manually and run the script again"
+        echo "${RED}${FW_BOLD}|> Failed packages are:${FW_NORMAL}${NC}"
 
-if [[ -z "${BASE_DIR}" ]]
-then
-    echo "${RED}|> Couldn't find setup folder, quitting${NC}"
-    exit 3
+        for package in "$failedPackages"
+        do
+            echo "${BLUE}|-->${NC} ${FW_BOLD}${package}${FW_NORMAL}"
+        done
+
+        echo "${RED}${FW_BOLD}Quitting${NC}${FW_NORMAL}"
+        exit 2
+    else
+        echo "${GREEN}|> All packages installed successfully${NC}"
+    fi
+
+    BASE_DIR=""
+    if [[ -f "./packages.list" ]]
+    then
+        BASE_DIR=$(pwd)
+    else
+        url=$(dirname $0)
+        if [[ -f "${url}/packages.list" ]]
+        then
+            BASE_DIR="$url"
+        fi
+    fi
+
+    if [[ -z "${BASE_DIR}" ]]
+    then
+        echo "${RED}|> Couldn't find setup folder, quitting${NC}"
+        exit 3
+    fi
 fi
 
 
