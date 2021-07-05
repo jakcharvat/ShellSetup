@@ -12,7 +12,7 @@ httpie
 lazygit
 nasm
 parallel
-powerlevel10k
+romkatv/powerlevel10k/powerlevel10k
 python
 ruby
 rust

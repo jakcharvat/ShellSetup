@@ -22,7 +22,7 @@ NC='\033[0m'
 FW_BOLD=$(tput bold)
 FW_NORMAL=$(tput sgr0)
 
-if [[ -n $1 && $1 != "--only-link" ]]
+if [[ -n $1 || $1 != "--only-link" ]]
 then
     echo "\n${YELLOW}${FW_BOLD}|> Checking Homebrew installation${NC}${FW_NORMAL}"
     which -s brew
