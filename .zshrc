@@ -142,6 +142,6 @@ autoload -U compinit && compinit
 #
 #
 #
-
 # To customize prompt, run `p10k configure` or edit ~/p10k-starship.zsh.
-[[ ! -f ~/p10k-starship.zsh ]] || source ~/p10k-starship.zsh
+[[ ! -f $(dirname $0)/p10k-starship.zsh ]] || source $(dirname $0)/p10k-starship.zsh
+
