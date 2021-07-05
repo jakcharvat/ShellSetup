@@ -58,8 +58,9 @@ then
     failedPackages=""
     for package in $(cat $(dirname $0)/packages.list)
     do
-        #break
         if [[ -z $package ]]; then continue; fi
+
+        if [[ "$package" == "gcc" && $(uname -s) != "Linux" ]]; then continue; fi
 
         if brew ls --versions "$package" > /dev/null
         then
