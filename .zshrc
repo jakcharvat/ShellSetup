@@ -59,7 +59,7 @@ export PATH="${BREW_DIR}/Cellar/node/15.10.0_1/bin:$PATH"
 
 
 # ------------------------------ FZF ------------------------------
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f "$(dirname $0)/.fzf.zsh" ] && source "$(dirname $0)/.fzf.zsh"
 export FZF_DEFAULT_OPTS='--height=60% --preview="bat --style="header" --color=always --line-range=:500 {}" --preview-window=right:60%:wrap'
 export FZF_DEFAULT_COMMAND='fd --exclude node_modules'
 export FZF_CTRL_T_COMMAND='fd --exclude node_modules'
@@ -87,11 +87,11 @@ vimf() {
 }
 
 create-gitignore() {
-  cp ~/default.gitignore ./.gitignore
+  cp "$(dirname $0)/default.gitignore" ./.gitignore
 }
 
 create-ccls-config () {
-  cp ~/.ccls.template ./.ccls
+  cp "$(dirname $0)/.ccls.template" ./.ccls
 }
 
 
