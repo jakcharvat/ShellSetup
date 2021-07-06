@@ -7,7 +7,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 BREW_DIR=""
-if [[ $(uname -s) =="Darwin" ]]
+if [[ $(uname -s) == "Darwin" ]]
 then
     BREW_DIR="/usr/local"
 else
