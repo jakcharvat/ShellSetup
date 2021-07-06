@@ -6,7 +6,14 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+BREW_DIR=""
+if [[ $(uname -s) =="Darwin" ]]
+then
+    BREW_DIR="/usr/local"
+else
+    BREW_DIR="/home/linuxbrew/.linuxbrew"
+fi
+source "${BREW_DIR}/opt/powerlevel10k/powerlevel10k.zsh-theme"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -38,13 +45,13 @@ export PATH="$PATH:/Users/jakcharvat/dev/compilers/coolc"
 
 
 # ------------------------------ Autocomplete and Syntax Highlighting ------------------------------
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source "${BREW_DIR}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+source "${BREW_DIR}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=60'
 
 
 # ------------------------------ Node ------------------------------
-export PATH=/usr/local/Cellar/node/15.10.0_1/bin:$PATH
+export PATH="${BREW_DIR}/Cellar/node/15.10.0_1/bin:$PATH"
 
 
 # ------------------------------ FZF ------------------------------
