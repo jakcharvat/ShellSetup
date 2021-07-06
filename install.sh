@@ -145,4 +145,3 @@ else
     echo "${GREEN}|--> Successfully wrote ${BOLD}.vimrc${FW_NORMAL}${NC}"
 fi
 
-echo "source ${BASE_DIR}/.vimrc" > ~/.vimrc

@@ -12,6 +12,10 @@ then
     BREW_DIR="/usr/local"
 else
     BREW_DIR="/home/linuxbrew/.linuxbrew"
+    test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+    test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+    test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+    echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
 fi
 source "${BREW_DIR}/opt/powerlevel10k/powerlevel10k.zsh-theme"
 
