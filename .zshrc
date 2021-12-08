@@ -52,6 +52,7 @@ export PATH="$PATH:/Users/jakcharvat/dev/compilers/coolc"
 source "${BREW_DIR}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 source "${BREW_DIR}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=60'
+# ZSH_AUTOSUGGEST_STRATEGY=(completion history)
 
 
 # ------------------------------ Node ------------------------------
@@ -82,16 +83,31 @@ gccgas() {
     gcc -fno-asynchronous-unwind-tables -fno-exceptions -fno-rtti -fverbose-asm -Wall -Wextra "$1.c" -O3 -masm=intel -S -o "$1.s"
 }
 
+ctonasm() {
+    BASE="${1%.*}"
+    gcc -fno-asynchronous-unwind-tables -fno-exceptions -fno-rtti -fverbose-asm -Wall -Wextra "$BASE.c" -O3 -masm=intel -o "$BASE.obj"
+    objconv -fnasm "$BASE.obj"
+    sed -i '' -e 's/align=1//g' -e 's/[a-z]*execute//g' -e 's/: *function//g' -e '/default *rel/d' "$BASE.asm"
+    rm "$BASE.obj"
+}
+
 vimf() {
   vim $(find "$1" -type f | fzf)
 }
 
+DIRNAME="$(dirname $0)"
 create-gitignore() {
-  cp "$(dirname $0)/default.gitignore" ./.gitignore
+  cp "${DIRNAME}/default.gitignore" ./.gitignore
 }
 
 create-ccls-config () {
-  cp "$(dirname $0)/.ccls.template" ./.ccls
+  cp "${DIRNAME}/.ccls.template" ./.ccls
+}
+
+
+get_abs_filename() {
+  # $1 : relative filename
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
 
@@ -102,14 +118,28 @@ alias lg="lazygit"
 
 
 # replacing ls with exa
-alias ls='exa --color=always --group-directories-first --icons'
+alias ls='exa --color=automatic --group-directories-first --icons'
 alias la='ls -al'
 alias ll='ls -l'
 alias lr='exa --colour=never'
+alias lsc='ls --color=always'
+alias lac='la --color=always'
+alias llc='la --color=always'
 alias lsdir="ll -D"
 
 
+# ssh
+alias sftp='sftp -F ~/.ssh/config'
+alias scp='scp -F ~/.ssh/config'
+
+
+alias comp='g++-11 -Wall -pedantic'
+
+
 hash -d d="/Users/jakcharvat/dev"
+hash -d pa="/Users/jakcharvat/FIT/PA1"
+hash -d eforce="/Users/jakcharvat/FIT/eForce"
+hash -d dock="/Users/jakcharvat/docker"
 
 setopt AUTO_CD
 
@@ -156,3 +186,32 @@ autoload -U compinit && compinit
 # To customize prompt, run `p10k configure` or edit ~/p10k-starship.zsh.
 [[ ! -f $(dirname $0)/p10k-starship.zsh ]] || source $(dirname $0)/p10k-starship.zsh
 
+
+# alias gcc=gcc-11
+# alias g++=g++-11
+
+
+# ------------------------------ GIT Aliases ------------------------------
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+git config --global alias.pl pull
+git config --global alias.ps push
+
+
+lfcd () {
+    tmp="$(mktemp)"
+    lf -last-dir-path="$tmp" "$@"
+    if [ -f "$tmp" ]; then
+        dir="$(cat "$tmp")"
+        rm -f "$tmp"
+        if [ -d "$dir" ]; then
+            if [ "$dir" != "$(pwd)" ]; then
+                cd "$dir"
+            fi
+        fi
+    fi
+}
+
+EDITOR='nvim'
