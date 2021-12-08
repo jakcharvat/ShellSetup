@@ -11,6 +11,7 @@ go
 heroku
 httpie
 lazygit
+make
 nasm
 parallel
 romkatv/powerlevel10k/powerlevel10k
